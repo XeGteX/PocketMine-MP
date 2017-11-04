@@ -395,10 +395,6 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 	/** @var bool */
 	public $onGround;
 	/** @var int */
-	public $deadTicks = 0;
-	/** @var int */
-	protected $maxDeadTicks = 0;
-	/** @var int */
 	protected $age = 0;
 
 	/** @var float */
@@ -899,6 +895,16 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		$this->scheduleUpdate();
 	}
 
+	/**
+	 * Called to tick entities while dead. Returns whether the entity should be flagged for despawn yet.
+	 *
+	 * @param int $tickDiff
+	 * @return bool
+	 */
+	protected function onDeathUpdate(int $tickDiff) : bool{
+		return true;
+	}
+
 	public function isAlive() : bool{
 		return $this->health > 0;
 	}
@@ -1288,13 +1294,10 @@ abstract class Entity extends Location implements Metadatable, EntityIds{
 		}
 
 		if(!$this->isAlive()){
-			$this->deadTicks += $tickDiff;
-			if($this->deadTicks >= $this->maxDeadTicks){
-				$this->despawnFromAll();
-				if(!$this->isPlayer){
-					$this->flagForDespawn();
-				}
+			if($this->onDeathUpdate($tickDiff)){
+				$this->flagForDespawn();
 			}
+
 			return true;
 		}
 
