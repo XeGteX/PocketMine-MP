@@ -100,8 +100,9 @@ class LevelDB extends BaseLevelProvider{
 			"compression" => LEVELDB_ZLIB_RAW_COMPRESSION
 		]);
 
-		if($this->levelData->getInt("StorageVersion", INT32_MAX, true) > self::CURRENT_STORAGE_VERSION){
-			throw new LevelException("Specified LevelDB world format version is not supported by " . \pocketmine\NAME);
+		$version = $this->levelData->getInt("StorageVersion", INT32_MAX, true);
+		if($version > self::CURRENT_STORAGE_VERSION){
+			throw new LevelException("Specified LevelDB world format version ($version) is not supported by " . \pocketmine\NAME);
 		}
 
 		if(!$this->levelData->hasTag("generatorName", StringTag::class)){
